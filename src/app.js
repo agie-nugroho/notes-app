@@ -1,7 +1,8 @@
+// src/app.js
 import "./scripts/components/index.js";
 import "./scripts/components/loading-indicator.js";
 import ApiService from "./scripts/data/api-service.js";
-import "./styles/style.css";
+import "/src/styles/style.css";
 
 let currentView = "active";
 let isLoading = false;
@@ -27,12 +28,18 @@ async function renderNotes() {
 
   try {
     showLoading();
-    const notes = await ApiService.getAllNotes();
+
+    let notes;
+    if (currentView === "active") {
+      notes = await ApiService.getAllNotes();
+    } else {
+      notes = await ApiService.getArchivedNotes(); // Panggil catatan terarsip
+      console.log("Archived Notes:", notes);
+    }
+
     hideLoading();
 
-    const filteredNotes = notes.filter((note) =>
-      currentView === "active" ? !note.archived : note.archived
-    );
+    const filteredNotes = notes;
 
     sectionTitle.textContent =
       currentView === "active" ? "Daftar Catatan" : "Catatan Terarsip";
@@ -47,12 +54,13 @@ async function renderNotes() {
     filteredNotes.forEach((note, index) => {
       const noteElement = document.createElement("note-item");
       noteElement.setAttribute("note-id", note.id);
+      noteElement.setAttribute("note-archived", note.archived);
       noteElement.style.animationDelay = `${index * 0.1}s`;
       notesList.appendChild(noteElement);
     });
   } catch (error) {
     hideLoading();
-    showFeedback("Error", "Gagal memuat catatan. Silahkan coba lagi.", "error");
+    showFeedback("Error", "Gagal memuat catatan. Silakan coba lagi.", "error");
   }
 }
 
@@ -84,4 +92,4 @@ document.addEventListener("DOMContentLoaded", () => {
   initTabs();
 });
 
-export { renderNotes, showLoading, showFeedback, hideLoading };
+export { renderNotes, showLoading, hideLoading, showFeedback };

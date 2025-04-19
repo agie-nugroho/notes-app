@@ -32,7 +32,7 @@ class ApiService {
       method: "POST",
     });
     const responseJson = await response.json();
-    return responseJson;
+    return responseJson.data;
   }
 
   static async unarchiveNote(id) {
@@ -41,6 +41,12 @@ class ApiService {
     });
     const responseJson = await response.json();
     return responseJson;
+  }
+
+  static async getArchivedNotes() {
+    const response = await fetch(`${BASE_URL}/notes/archived`);
+    const json = await response.json();
+    return json.data;
   }
 }
 

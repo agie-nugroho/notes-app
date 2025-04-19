@@ -17,10 +17,14 @@ class NoteItem extends HTMLElement {
   }
 
   async attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "note-id") {
+    const noteId = this.getAttribute("note-id");
+    const isArchived = this.getAttribute("note-archived") === "true";
+    if (noteId) {
       try {
         showLoading();
-        const notes = await ApiService.getAllNotes();
+        const notes = isArchived
+          ? await ApiService.getArchivedNotes()
+          : await ApiService.getAllNotes();
         hideLoading();
 
         const note = notes.find((note) => note.id === newValue);
@@ -41,10 +45,14 @@ class NoteItem extends HTMLElement {
 
   async connectedCallback() {
     const noteId = this.getAttribute("note-id");
+    const isArchived = this.getAttribute("note-archived") === "true";
+
     if (noteId) {
       try {
         showLoading();
-        const notes = await ApiService.getAllNotes();
+        const notes = isArchived
+          ? await ApiService.getArchivedNotes()
+          : await ApiService.getAllNotes();
         hideLoading();
         const note = notes.find((note) => note.id === noteId);
         if (note) {
